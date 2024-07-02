@@ -8,11 +8,17 @@ import {
   Row
 } from 'react-bootstrap';
 
+import { useQuery } from "@apollo/client";
+import { QUERY_BOOKS } from "../utils/queries";
+
 import Auth from '../utils/auth';
 import { saveBook, searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 
 const SearchBooks = () => {
+
+  const { loading, data } = useQuery(QUERY_BOOKS);
+  
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
   // create state for holding our search field data
