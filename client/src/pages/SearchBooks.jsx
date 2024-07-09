@@ -10,28 +10,39 @@ import {
 
 import { useQuery } from "@apollo/client";
 import { QUERY_BOOKS } from "../utils/queries";
+import { useMutation } from '@apollo/client';
+import { SAVE_BOOK } from '../utils/mutations';
 
 import Auth from '../utils/auth';
-import { saveBook, searchGoogleBooks } from '../utils/API';
+//import { saveBook, searchGoogleBooks } from '../utils/API';
+import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
-
 const SearchBooks = () => {
 
   const { loading, data } = useQuery(QUERY_BOOKS);
   
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
+  
+  console.log("Searched Books: " + JSON.stringify(searchedBooks));
+  
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
 
+  console.log("Saved Book ID's: " + savedBookIds);
+
+  const [saveBook] = useMutation(SAVE_BOOK);
+
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
   // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
-  useEffect(() => {
-    return () => saveBookIds(savedBookIds);
-  });
+  //useEffect(() => {
+  //  return () => saveBookIds(savedBookIds);
+  //});
+  //console.log("Saved book ids: " + savedBookIds);
+
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
@@ -59,6 +70,7 @@ const SearchBooks = () => {
       }));
 
       setSearchedBooks(bookData);
+      console.log("Set Searched Books book data: " + JSON.stringify(bookData));
       setSearchInput('');
     } catch (err) {
       console.error(err);
@@ -68,25 +80,40 @@ const SearchBooks = () => {
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
+
+    console.log("Book ID: " + bookId);
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+
+    console.log("Book to save: " + JSON.stringify(bookToSave));
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-
+    console.log("Token: " + token);
     if (!token) {
       return false;
     }
 
     try {
-      const response = await saveBook(bookToSave, token);
+      //const response = await saveBook(bookToSave, token);
 
-      if (!response.ok) {
-        throw new Error('something went wrong!');
-      }
+      //if (!response.ok) {
+      //  throw new Error('something went wrong!');
+      //}
+
+      //const { data } = saveBook({
+      //  variables: { ...bookToSave }
+      //});
+
+      const response = await saveBook({
+        variables: { ...bookToSave, token }
+      });
+
+      console.log("Response: " + JSON.stringify(response) );
 
       // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
+      console.log("Error: " + err);
       console.error(err);
     }
   };

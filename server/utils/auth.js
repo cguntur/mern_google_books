@@ -36,4 +36,13 @@ module.exports = {
 
     return jwt.sign({ data: payload }, secret, { expiresIn: expiration });
   },
+  decryptToken: function (token) {
+    try {
+      const { data } = jwt.verify(token, secret, { maxAge: expiration });
+      return data._id;
+    } catch {
+      console.log('Invalid token');
+      return '';
+    }
+  },
 };

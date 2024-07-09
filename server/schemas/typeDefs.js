@@ -38,12 +38,10 @@ const typeDefs = `
             password: String!
         ): Auth
         saveBook(
-            authors: [String], 
+            bookId: ID!,
+            title: String!, 
             description: String,
-            bookId: ID,
-            image: String,
-            link: String,
-            title: String
+            token: String!
         ): User
         deleteBook(bookId: ID!) : User
     }

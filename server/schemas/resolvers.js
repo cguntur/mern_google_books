@@ -1,5 +1,5 @@
 const { User, Book } = require('../models');
-const { signToken, AuthenticationError } = require('../utils/auth');
+const { signToken, AuthenticationError, decryptToken } = require('../utils/auth');
 
 const resolvers = {
     Query: {
@@ -7,9 +7,15 @@ const resolvers = {
           return User.find({});
         },
 
-        user: async (parent, {userId}) => {
+        //user: async (parent, {userId}) => {
+        //  return User.findOne({
+        //    _id: userId
+        //  });
+        //},
+
+        user: async (parent, args, context) => {
           return User.findOne({
-            _id: userId
+            _id: context.user._id
           });
         },
 
@@ -44,21 +50,37 @@ const resolvers = {
         },
 
         saveBook: async (parent, args, context) => {
-          if(context.user){
-            return User.findOneAndUpdate(
-              { _id: context.user._id },
-              { 
-                $addToSet: { 
-                  savedBooks: args
-                }
-              },
-              { 
-                new: true, 
-                runValidators: true 
-              }
-            );
+          const userId = decryptToken(args.token);
+          //return User.findById("668449ddd087aaa5cefc693d");
+          //return {
+          //  "_id": "668449ddd087aaa5cefc693d",
+          //  "username": "testuser2",
+          //  "email": "testuser2@gmail.com",
+          //  "password": userId,
+          //  "savedBooks": [{
+          //    "bookId": args.bookId,
+          //    "authors": args.authors,
+          //    "description": args.description,
+          //    "image": args.image,
+          //    "link": args.link,
+          //    "title": args.title,
+          //  }]
+          //}; 
+          if (!userId) {
+            throw new Error("Unauthenticated");
           }
-          throw AuthenticationError;
+          return await User.findOneAndUpdate(
+            { _id: userId },
+            { 
+              $addToSet: { 
+                savedBooks: { bookId: args.bookId, title: args.title, description: args.description }
+              }
+            },
+            { 
+              new: true, 
+              runValidators: true 
+            }
+          );
         },
 
         deleteBook: async (parent, args, context) => {

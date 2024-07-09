@@ -27,6 +27,7 @@ const client = new ApolloClient({
   //link: authLink.concat(httpLink),
   uri: '/graphql',
   cache: new InMemoryCache(),
+  connectToDevTools: true,
 });
 
 function App() {
