@@ -23,29 +23,28 @@ const typeDefs = `
 
     type Query {
         users: [User]
-        user: User
-        books: [Book]
+        user(userId: ID!): User
+        me: User
     }
      
     type Mutation {
         createUser(
-            username: String!, 
-            email: String!, 
+            username: String! 
+            email: String!
             password: String!
         ): Auth
         loginUser(
-            email: String!, 
+            email: String! 
             password: String!
         ): Auth
         saveBook(
-            bookId: ID!,
-            title: String!, 
-            description: String,
+            bookId: ID!
+            title: String! 
+            description: String
             token: String!
         ): User
         deleteBook(bookId: ID!) : User
     }
-
 `;
 
 module.exports = typeDefs;

@@ -12,28 +12,30 @@ import { useQuery } from "@apollo/client";
 import { QUERY_BOOKS } from "../utils/queries";
 import { useMutation } from '@apollo/client';
 import { SAVE_BOOK } from '../utils/mutations';
+import { QUERY_ME } from '../utils/queries';
 
 import Auth from '../utils/auth';
 //import { saveBook, searchGoogleBooks } from '../utils/API';
 import { searchGoogleBooks } from '../utils/API';
-import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+//import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
+
 const SearchBooks = () => {
 
-  const { loading, data } = useQuery(QUERY_BOOKS);
-  
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
-  
   console.log("Searched Books: " + JSON.stringify(searchedBooks));
   
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
 
   // create state to hold saved bookId values
-  const [savedBookIds, setSavedBookIds] = useState(getSavedBookIds());
-
-  console.log("Saved Book ID's: " + savedBookIds);
-
+  const [savedBookIds, setSavedBookIds] = useState([]);
+  const { loading, data } = useQuery(QUERY_ME);
+  console.log("loading: " + JSON.stringify(loading) + ", data: " + JSON.stringify(data));
+  const mySavedBooks = (data?.me.savedBooks || [])
+  const mySavedBookIds = mySavedBooks.map(book => book.bookId);
+  console.log("mySavedBookIds: " + JSON.stringify(mySavedBookIds));
+  
   const [saveBook] = useMutation(SAVE_BOOK);
 
   // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
@@ -42,7 +44,6 @@ const SearchBooks = () => {
   //  return () => saveBookIds(savedBookIds);
   //});
   //console.log("Saved book ids: " + savedBookIds);
-
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
@@ -54,7 +55,6 @@ const SearchBooks = () => {
 
     try {
       const response = await searchGoogleBooks(searchInput);
-
       if (!response.ok) {
         throw new Error('something went wrong!');
       }
@@ -70,7 +70,8 @@ const SearchBooks = () => {
       }));
 
       setSearchedBooks(bookData);
-      console.log("Set Searched Books book data: " + JSON.stringify(bookData));
+
+      console.log("Searched Books: " + JSON.stringify(bookData));
       setSearchInput('');
     } catch (err) {
       console.error(err);
@@ -111,7 +112,8 @@ const SearchBooks = () => {
       console.log("Response: " + JSON.stringify(response) );
 
       // if book successfully saves to user's account, save book id to state
-      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      //setSavedBookIds([...savedBookIds, bookToSave.bookId]);
+      setSavedBookIds([...savedBookIds]);
     } catch (err) {
       console.log("Error: " + err);
       console.error(err);
@@ -153,6 +155,7 @@ const SearchBooks = () => {
         </h2>
         <Row>
           {searchedBooks.map((book) => {
+            {console.log("Book id: " + book.bookId)}
             return (
               <Col md="4" key={book.bookId}>
                 <Card border='dark'>
