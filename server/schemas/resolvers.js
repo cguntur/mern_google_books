@@ -46,21 +46,6 @@ const resolvers = {
 
     saveBook: async (parent, args, context) => {
       const userId = decryptToken(args.token);
-      //return User.findById("668449ddd087aaa5cefc693d");
-      //return {
-      // "_id": "668449ddd087aaa5cefc693d",
-      // "username": "testuser2",
-      // "email": "testuser2@gmail.com",
-      // "password": userId,
-      // "savedBooks": [{
-      // "bookId": args.bookId,
-      // "authors": args.authors,
-      // "description": args.description,
-      // "image": args.image,
-      // "link": args.link,
-      // "title": args.title,
-      // }]
-      //};
       
       if (!userId) {
         throw new Error("Unauthenticated");

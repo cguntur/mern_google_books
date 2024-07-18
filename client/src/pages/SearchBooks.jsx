@@ -23,7 +23,6 @@ const SearchBooks = () => {
 
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState([]);
-  console.log("Searched Books: " + JSON.stringify(searchedBooks));
   
   // create state for holding our search field data
   const [searchInput, setSearchInput] = useState('');
@@ -31,19 +30,10 @@ const SearchBooks = () => {
   // create state to hold saved bookId values
   const [savedBookIds, setSavedBookIds] = useState([]);
   const { loading, data } = useQuery(QUERY_ME);
-  console.log("loading: " + JSON.stringify(loading) + ", data: " + JSON.stringify(data));
   const mySavedBooks = (data?.me.savedBooks || [])
   const mySavedBookIds = mySavedBooks.map(book => book.bookId);
-  console.log("mySavedBookIds: " + JSON.stringify(mySavedBookIds));
   
   const [saveBook] = useMutation(SAVE_BOOK);
-
-  // set up useEffect hook to save `savedBookIds` list to localStorage on component unmount
-  // learn more here: https://reactjs.org/docs/hooks-effect.html#effects-with-cleanup
-  //useEffect(() => {
-  //  return () => saveBookIds(savedBookIds);
-  //});
-  //console.log("Saved book ids: " + savedBookIds);
 
   // create method to search for books and set state on form submit
   const handleFormSubmit = async (event) => {
@@ -71,7 +61,6 @@ const SearchBooks = () => {
 
       setSearchedBooks(bookData);
 
-      console.log("Searched Books: " + JSON.stringify(bookData));
       setSearchInput('');
     } catch (err) {
       console.error(err);
@@ -82,40 +71,22 @@ const SearchBooks = () => {
   const handleSaveBook = async (bookId) => {
     // find the book in `searchedBooks` state by the matching id
 
-    console.log("Book ID: " + bookId);
     const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
-
-    console.log("Book to save: " + JSON.stringify(bookToSave));
 
     // get token
     const token = Auth.loggedIn() ? Auth.getToken() : null;
-    console.log("Token: " + token);
     if (!token) {
       return false;
     }
 
     try {
-      //const response = await saveBook(bookToSave, token);
-
-      //if (!response.ok) {
-      //  throw new Error('something went wrong!');
-      //}
-
-      //const { data } = saveBook({
-      //  variables: { ...bookToSave }
-      //});
-
       const response = await saveBook({
         variables: { ...bookToSave, token }
       });
 
-      console.log("Response: " + JSON.stringify(response) );
-
       // if book successfully saves to user's account, save book id to state
-      //setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      setSavedBookIds([...savedBookIds]);
+      setSavedBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
-      console.log("Error: " + err);
       console.error(err);
     }
   };
@@ -155,7 +126,6 @@ const SearchBooks = () => {
         </h2>
         <Row>
           {searchedBooks.map((book) => {
-            {console.log("Book id: " + book.bookId)}
             return (
               <Col md="4" key={book.bookId}>
                 <Card border='dark'>
