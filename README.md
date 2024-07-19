@@ -22,5 +22,5 @@
 <img src="./client/src/assets/google_books_site.png" alt="Google Books API website Screenshot" width="400"/>
 
 ## Working Example
-[View the website here](https://gcsdesign-blog-43fec2242915.herokuapp.com/)
+[View the website here](https://mern-google-books.onrender.com/)
 
