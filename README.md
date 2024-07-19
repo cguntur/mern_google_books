@@ -1,6 +1,6 @@
 # Google Books API Search Engine
 
-## A website that enables you to search books via the Google Books API and lets you save it to your account.
+## A website that enables you to search books via the Google Books API and lets you save the books to your account
 
 ## Features
 
